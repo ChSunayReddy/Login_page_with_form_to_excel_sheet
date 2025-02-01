@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .email {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .logout {
+            margin-top: 20px;
+        }
+
+        .logout button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .logout button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to Your Account</h2>
+        <p class="email" id="account-email">Loading...</p>
+
+        <form id="self-detail-form" class="self-detail-form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+            </div>
+            <div class="form-group">
+                <label for="about">About You</label>
+                <textarea id="about" name="about" rows="4" placeholder="Tell us about yourself"></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit Details</button>
+            </div>
+        </form>
+
+        <div class="logout">
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Fetch the logged-in account details from localStorage
+        const loggedInAccount = JSON.parse(localStorage.getItem('loggedInAccount'));
+
+        if (loggedInAccount && loggedInAccount.email) {
+            document.getElementById('account-email').textContent = `Email: ${loggedInAccount.email}`;
+        } else {
+            document.getElementById('account-email').textContent = 'No account details available.';
+        }
+
+        // Handle form submission and send data to backend
+        document.getElementById('self-detail-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const about = document.getElementById('about').value;
+
+            const userDetails = { name, phone, about };
+
+            try {
+                const response = await fetch('http://localhost:5000/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userDetails)
+                });
+
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                console.error('Error submitting details:', error);
+                alert('Failed to submit details.');
+            }
+
+            document.getElementById('self-detail-form').reset();
+        });
+
+        function logout() {
+            localStorage.removeItem('loggedInAccount');
+            window.location.href = 'index.html'; // Redirect to the login page
+        }
+    </script>
+</body>
+</html>
